@@ -1,0 +1,54 @@
+[
+  {
+    "query": "Find invoices, retrieve invoice details, create a draft invoice, and send it",
+    "expected_tool_ids": [
+      "paypal_get_1e32579a6913",
+      "paypal_get_f506be6582f6",
+      "paypal_post_86ab650000de",
+      "paypal_post_273229bf3bdf"
+    ]
+  },
+  {
+    "query": "Search the product catalog, get a product, create a product, or update product details",
+    "expected_tool_ids": [
+      "paypal_get_4646d810b750",
+      "paypal_get_c3744fc3bbe4",
+      "paypal_post_58445fd18eda",
+      "paypal_patch_b84af0c12340"
+    ]
+  },
+  {
+    "query": "Find and manage subscriptions, including creation, cancellation, activation, revision, and suspension",
+    "expected_tool_ids": [
+      "paypal_get_56a5528accf8",
+      "paypal_post_5f3c4101bb7a",
+      "paypal_post_1ea17976d1ca",
+      "paypal_post_7537d3e6a400",
+      "paypal_post_7bc94350df34",
+      "paypal_post_f710d7be7dea"
+    ]
+  },
+  {
+    "query": "List disputes, retrieve a dispute, and update dispute details",
+    "expected_tool_ids": [
+      "paypal_get_e824b403c539",
+      "paypal_get_d24316ffb3a6",
+      "paypal_patch_9e4785e931e7"
+    ]
+  },
+  {
+    "query": "List webhooks, inspect event types, and create a webhook subscription",
+    "expected_tool_ids": [
+      "paypal_get_85f1f15908b8",
+      "paypal_get_5b2044ece904",
+      "paypal_post_21fcb23cea20"
+    ]
+  },
+  {
+    "query": "Find a refund, retrieve refund details, or refund a captured payment",
+    "expected_tool_ids": [
+      "paypal_get_78332ab46ac2",
+      "paypal_post_9e63f2e2c5c9"
+    ]
+  }
+]

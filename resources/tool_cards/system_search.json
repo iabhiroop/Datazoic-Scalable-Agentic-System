@@ -1,0 +1,388 @@
+{
+  "tool_id": "system_search",
+  "schema_version": "1",
+  "adapter_key": "system_search",
+  "name": "System Search",
+  "description": "Search authorized capabilities, current request status and sanitized execution history.",
+  "examples": [],
+  "synonyms": [],
+  "category_ids": [
+    "system"
+  ],
+  "entities": [
+    "tool",
+    "run"
+  ],
+  "action": "search",
+  "input_schema": {
+    "$defs": {
+      "CapabilitiesArguments": {
+        "additionalProperties": false,
+        "properties": {
+          "mode": {
+            "const": "capabilities",
+            "title": "Mode",
+            "type": "string"
+          },
+          "query": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Query",
+            "type": "string"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Category"
+          },
+          "limit": {
+            "default": 5,
+            "maximum": 20,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "mode",
+          "query"
+        ],
+        "title": "CapabilitiesArguments",
+        "type": "object"
+      },
+      "HistoryArguments": {
+        "additionalProperties": false,
+        "properties": {
+          "run_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Run Id"
+          },
+          "selector": {
+            "anyOf": [
+              {
+                "const": "last",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Selector"
+          },
+          "mode": {
+            "const": "execution_history",
+            "title": "Mode",
+            "type": "string"
+          },
+          "limit": {
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cursor"
+          }
+        },
+        "required": [
+          "mode"
+        ],
+        "title": "HistoryArguments",
+        "type": "object"
+      },
+      "StatusArguments": {
+        "additionalProperties": false,
+        "properties": {
+          "run_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Run Id"
+          },
+          "selector": {
+            "anyOf": [
+              {
+                "const": "last",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Selector"
+          },
+          "mode": {
+            "const": "request_status",
+            "title": "Mode",
+            "type": "string"
+          }
+        },
+        "required": [
+          "mode"
+        ],
+        "title": "StatusArguments",
+        "type": "object"
+      }
+    },
+    "discriminator": {
+      "mapping": {
+        "capabilities": "#/$defs/CapabilitiesArguments",
+        "execution_history": "#/$defs/HistoryArguments",
+        "request_status": "#/$defs/StatusArguments"
+      },
+      "propertyName": "mode"
+    },
+    "oneOf": [
+      {
+        "$ref": "#/$defs/CapabilitiesArguments"
+      },
+      {
+        "$ref": "#/$defs/StatusArguments"
+      },
+      {
+        "$ref": "#/$defs/HistoryArguments"
+      }
+    ]
+  },
+  "output_schema": {
+    "$defs": {
+      "CapabilitiesResult": {
+        "additionalProperties": false,
+        "properties": {
+          "capabilities": {
+            "items": {
+              "$ref": "#/$defs/Capability"
+            },
+            "title": "Capabilities",
+            "type": "array"
+          }
+        },
+        "required": [
+          "capabilities"
+        ],
+        "title": "CapabilitiesResult",
+        "type": "object"
+      },
+      "Capability": {
+        "additionalProperties": false,
+        "properties": {
+          "tool_id": {
+            "title": "Tool Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "operation_type": {
+            "enum": [
+              "read",
+              "write"
+            ],
+            "title": "Operation Type",
+            "type": "string"
+          },
+          "category_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Category Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "tool_id",
+          "name",
+          "description",
+          "operation_type",
+          "category_ids"
+        ],
+        "title": "Capability",
+        "type": "object"
+      },
+      "HistoryResult": {
+        "additionalProperties": false,
+        "properties": {
+          "run_id": {
+            "format": "uuid",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "run_created_at": {
+            "format": "date-time",
+            "title": "Run Created At",
+            "type": "string"
+          },
+          "events": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "run_id",
+          "run_created_at",
+          "events"
+        ],
+        "title": "HistoryResult",
+        "type": "object"
+      },
+      "OperationSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "operation_id": {
+            "format": "uuid",
+            "title": "Operation Id",
+            "type": "string"
+          },
+          "state": {
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "operation_id",
+          "state"
+        ],
+        "title": "OperationSummary",
+        "type": "object"
+      },
+      "StatusResult": {
+        "additionalProperties": false,
+        "properties": {
+          "run_id": {
+            "format": "uuid",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "run_created_at": {
+            "format": "date-time",
+            "title": "Run Created At",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "operations": {
+            "items": {
+              "$ref": "#/$defs/OperationSummary"
+            },
+            "title": "Operations",
+            "type": "array"
+          },
+          "as_of": {
+            "format": "date-time",
+            "title": "As Of",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "run_created_at",
+          "status",
+          "summary",
+          "operations",
+          "as_of"
+        ],
+        "title": "StatusResult",
+        "type": "object"
+      }
+    },
+    "anyOf": [
+      {
+        "$ref": "#/$defs/CapabilitiesResult"
+      },
+      {
+        "$ref": "#/$defs/StatusResult"
+      },
+      {
+        "$ref": "#/$defs/HistoryResult"
+      }
+    ]
+  },
+  "operation_type": "read",
+  "required_scopes": [
+    "system:read"
+  ],
+  "precondition_key": null,
+  "verification_key": "system_search_result",
+  "timeout_seconds": 30,
+  "retry_policy": {
+    "max_attempts": 3,
+    "safe_error_codes": [],
+    "write_transport_retry_allowed": false
+  },
+  "idempotency": {
+    "supported": false,
+    "header_or_field": null,
+    "retention_seconds": null,
+    "request_consistency_rules": null
+  },
+  "reconciliation_key": null,
+  "reconciliation_deadline_seconds": null,
+  "max_status_checks": null,
+  "provider": "internal",
+  "provider_account_key": "internal",
+  "status": "draft",
+  "embedding_model": null,
+  "embedding_version": null
+}

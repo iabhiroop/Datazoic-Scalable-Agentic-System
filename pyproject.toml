@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "simplified-agentic-system"
+version = "0.1.0"
+description = "Stub-first implementation of a sequential, durable agentic system"
+requires-python = ">=3.11"
+# Provisional dependencies. Lock compatible versions after integration checks.
+dependencies = [
+  "fastapi", "uvicorn", "pydantic>=2,<3", "pydantic-settings>=2,<3", "python-dotenv",
+  "sqlalchemy[asyncio]>=2,<3", "alembic", "psycopg[binary,pool]", "pgvector",
+  "langchain>=1,<2", "langchain-google-genai>=4,<5", "langchain-ollama>=1,<2",
+  "langgraph", "langgraph-checkpoint-postgres", "httpx", "jsonschema",
+  "google-genai==2.30.0",
+  "redis", "boto3", "langfuse==4.17.0", "opentelemetry-api", "opentelemetry-sdk",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-asyncio", "ruff"]
+ui = ["streamlit>=1.37,<2"]
+
+[project.scripts]
+agent-api = "app.main:main"
+agent-admin = "app.cli:main"
+agent-worker = "app.worker.main:main"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100

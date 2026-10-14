@@ -1,0 +1,14 @@
+# Local development build from the official source-only MinIO release.
+FROM golang:1.24.8-bookworm AS build
+ENV CGO_ENABLED=0 GOTOOLCHAIN=local
+RUN go install -trimpath github.com/minio/minio@RELEASE.2025-10-15T17-29-55Z
+
+FROM debian:bookworm-slim
+COPY --from=build /go/bin/minio /usr/local/bin/minio
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+RUN mkdir /data && chown 1000:1000 /data
+ENV HOME=/tmp
+USER 1000:1000
+EXPOSE 9000 9001
+ENTRYPOINT ["minio"]
+CMD ["server", "/data", "--console-address", ":9001"]

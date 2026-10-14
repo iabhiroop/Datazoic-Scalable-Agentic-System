@@ -1,0 +1,178 @@
+{
+  "tool_id": "rag_pipeline",
+  "schema_version": "1",
+  "adapter_key": "rag_pipeline",
+  "name": "RAG Pipeline",
+  "description": "Retrieve authorized knowledge passages, optionally returning a grounded answer.",
+  "examples": [],
+  "synonyms": [],
+  "category_ids": [
+    "knowledge"
+  ],
+  "entities": [
+    "document"
+  ],
+  "action": "retrieve",
+  "input_schema": {
+    "additionalProperties": false,
+    "properties": {
+      "query": {
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Query",
+        "type": "string"
+      },
+      "mode": {
+        "default": "context",
+        "enum": [
+          "context",
+          "answer"
+        ],
+        "title": "Mode",
+        "type": "string"
+      },
+      "corpus_ids": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Corpus Ids",
+        "type": "array"
+      },
+      "top_k": {
+        "default": 4,
+        "maximum": 6,
+        "minimum": 1,
+        "title": "Top K",
+        "type": "integer"
+      }
+    },
+    "required": [
+      "query"
+    ],
+    "title": "RagArguments",
+    "type": "object"
+  },
+  "output_schema": {
+    "$defs": {
+      "Passage": {
+        "additionalProperties": false,
+        "properties": {
+          "chunk_id": {
+            "title": "Chunk Id",
+            "type": "string"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "document_version": {
+            "title": "Document Version",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "locator": {
+            "title": "Locator",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "score": {
+            "title": "Score",
+            "type": "number"
+          }
+        },
+        "required": [
+          "chunk_id",
+          "document_id",
+          "document_version",
+          "title",
+          "locator",
+          "text",
+          "score"
+        ],
+        "title": "Passage",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "query": {
+        "title": "Query",
+        "type": "string"
+      },
+      "sufficient_evidence": {
+        "title": "Sufficient Evidence",
+        "type": "boolean"
+      },
+      "answer": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Answer"
+      },
+      "source_ids": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Source Ids",
+        "type": "array"
+      },
+      "passages": {
+        "items": {
+          "$ref": "#/$defs/Passage"
+        },
+        "title": "Passages",
+        "type": "array"
+      },
+      "knowledge_revision": {
+        "title": "Knowledge Revision",
+        "type": "integer"
+      }
+    },
+    "required": [
+      "query",
+      "sufficient_evidence",
+      "passages",
+      "knowledge_revision"
+    ],
+    "title": "RagResult",
+    "type": "object"
+  },
+  "operation_type": "read",
+  "required_scopes": [
+    "knowledge:read"
+  ],
+  "precondition_key": null,
+  "verification_key": "rag_result",
+  "timeout_seconds": 30,
+  "retry_policy": {
+    "max_attempts": 3,
+    "safe_error_codes": [],
+    "write_transport_retry_allowed": false
+  },
+  "idempotency": {
+    "supported": false,
+    "header_or_field": null,
+    "retention_seconds": null,
+    "request_consistency_rules": null
+  },
+  "reconciliation_key": null,
+  "reconciliation_deadline_seconds": null,
+  "max_status_checks": null,
+  "provider": "internal",
+  "provider_account_key": "internal",
+  "status": "draft",
+  "embedding_model": null,
+  "embedding_version": null
+}

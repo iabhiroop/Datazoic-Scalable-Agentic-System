@@ -1,0 +1,53 @@
+# Local credentials and configuration
+.env
+.env.*
+!.env.example
+.envrc
+.streamlit/secrets.toml
+secrets/
+credentials.json
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Python environments and generated files
+.venv/
+.uv-cache/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+.tox/
+.nox/
+.mypy_cache/
+.hypothesis/
+coverage.xml
+.coverage
+.coverage.*
+htmlcov/
+
+# Local runtime state and generated databases
+runtime/
+*.sqlite
+*.sqlite3
+*.db
+
+# Editors and operating systems
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+
+# Local scratch files and assignment materials
+/temp.json
+/test_gemini.py
+/report_v1.txt
+/Datazoic Programming Task.md
+/Datazoic Programming Task.pdf

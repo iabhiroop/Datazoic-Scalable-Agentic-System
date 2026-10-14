@@ -1,0 +1,90 @@
+# Local development. Apply application migrations and checkpoint setup before API startup.
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: agent
+      POSTGRES_PASSWORD: local-dev-only
+      POSTGRES_DB: agent
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "127.0.0.1:6379:6379"
+  object-storage:
+    image: datazoic-minio:RELEASE.2025-10-15T17-29-55Z
+    build:
+      context: .
+      dockerfile: Dockerfile.minio
+    command: server /data --console-address :9001
+    environment:
+      MINIO_ROOT_USER: ${OBJECT_STORAGE_ACCESS_KEY:?Set local object storage access key}
+      MINIO_ROOT_PASSWORD: ${OBJECT_STORAGE_SECRET_KEY:?Set local object storage secret key}
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+    volumes:
+      - object-data:/data
+  api:
+    build: .
+    profiles: [app]
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg://agent:local-dev-only@postgres:5432/agent
+      CHECKPOINT_DATABASE_URL: postgresql://agent:local-dev-only@postgres:5432/agent
+      EMBEDDING_DIMENSION: ${EMBEDDING_DIMENSION:-}
+      AUTH_BINDINGS_JSON: ${AUTH_BINDINGS_JSON:-[]}
+      LLM_PROVIDER: ${LLM_PROVIDER:-gemini}
+      GRAPH_VERSION: ${GRAPH_VERSION:-v2}
+      GEMINI_MODEL_NAME: ${GEMINI_MODEL_NAME:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      PAYPAL_SANDBOX_CLIENT_ID: ${PAYPAL_SANDBOX_CLIENT_ID:-}
+      PAYPAL_SANDBOX_CLIENT_SECRET: ${PAYPAL_SANDBOX_CLIENT_SECRET:-}
+      PAYPAL_SANDBOX_TENANT_ID: ${PAYPAL_SANDBOX_TENANT_ID:-}
+      PAYPAL_SANDBOX_WRITES_ENABLED: ${PAYPAL_SANDBOX_WRITES_ENABLED:-false}
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
+      LANGFUSE_BASE_URL: ${LANGFUSE_BASE_URL:-}
+      LANGFUSE_TRACING_ENABLED: ${LANGFUSE_TRACING_ENABLED:-true}
+      LANGFUSE_CAPTURE_CONTENT: ${LANGFUSE_CAPTURE_CONTENT:-true}
+      REDIS_URL: redis://redis:6379/0
+      OBJECT_STORAGE_ENDPOINT: http://object-storage:9000
+      OBJECT_STORAGE_BUCKET: ${OBJECT_STORAGE_BUCKET:-agent-payloads}
+      OBJECT_STORAGE_ACCESS_KEY: ${OBJECT_STORAGE_ACCESS_KEY:-}
+      OBJECT_STORAGE_SECRET_KEY: ${OBJECT_STORAGE_SECRET_KEY:-}
+  worker:
+    build: .
+    profiles: [app]
+    command: ["agent-worker"]
+    environment:
+      DATABASE_URL: postgresql+psycopg://agent:local-dev-only@postgres:5432/agent
+      CHECKPOINT_DATABASE_URL: postgresql://agent:local-dev-only@postgres:5432/agent
+      EMBEDDING_DIMENSION: ${EMBEDDING_DIMENSION:-}
+      LLM_PROVIDER: ${LLM_PROVIDER:-gemini}
+      GRAPH_VERSION: ${GRAPH_VERSION:-v2}
+      LLM_TRACE_DIR: /workspace/runtime/llm-traces
+      GEMINI_MODEL_NAME: ${GEMINI_MODEL_NAME:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      PAYPAL_SANDBOX_CLIENT_ID: ${PAYPAL_SANDBOX_CLIENT_ID:-}
+      PAYPAL_SANDBOX_CLIENT_SECRET: ${PAYPAL_SANDBOX_CLIENT_SECRET:-}
+      PAYPAL_SANDBOX_TENANT_ID: ${PAYPAL_SANDBOX_TENANT_ID:-}
+      PAYPAL_SANDBOX_WRITES_ENABLED: ${PAYPAL_SANDBOX_WRITES_ENABLED:-false}
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
+      LANGFUSE_BASE_URL: ${LANGFUSE_BASE_URL:-}
+      LANGFUSE_TRACING_ENABLED: ${LANGFUSE_TRACING_ENABLED:-true}
+      LANGFUSE_CAPTURE_CONTENT: ${LANGFUSE_CAPTURE_CONTENT:-true}
+      REDIS_URL: redis://redis:6379/0
+      OBJECT_STORAGE_ENDPOINT: http://object-storage:9000
+      OBJECT_STORAGE_BUCKET: ${OBJECT_STORAGE_BUCKET:-agent-payloads}
+      OBJECT_STORAGE_ACCESS_KEY: ${OBJECT_STORAGE_ACCESS_KEY:-}
+      OBJECT_STORAGE_SECRET_KEY: ${OBJECT_STORAGE_SECRET_KEY:-}
+    volumes:
+      - ${LLM_TRACE_DIR:-runtime/llm-traces}:/workspace/runtime/llm-traces
+volumes:
+  postgres-data:
+  object-data:
