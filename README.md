@@ -12,7 +12,6 @@ The full API catalog stays in the registry rather than appearing in every prompt
 - [Agent and execution](#agent-and-execution)
 - [Tool onboarding](#tool-onboarding)
 - [Testing](#testing)
-- [Known limitations](#known-limitations)
 - [Documentation](#documentation)
 
 ## Features
@@ -44,7 +43,7 @@ to the model for continuation and a final answer.
 
 ### Recorded example
 
-> List any one invoice in the sandbox
+> List the invoices in the sandbox
 
 Recorded on Using Ollama `llama3.2` for classification and tool selection. The supplied logs and exchange show:
 
@@ -70,6 +69,30 @@ Recorded on Using Ollama `llama3.2` for classification and tool selection. The s
 
 One returned invoice was `INV2-BB9S-EY3T-NBN2-GKLV`, status `DRAFT`, amount
 **USD 30.00**.
+
+### Final result shown in the UI
+
+The following is a list of invoices in the sandbox:
+
+| Invoice ID | Status | Invoice Number | Currency Code |
+| --- | --- | --- | --- |
+| INV2-BB9S-EY3T-NBN2-GKLV | DRAFT | SEED-20261014-03 | USD |
+| INV2-CTX3-KG9L-4JBP-UJV9 | DRAFT | SEED-20261014-02 | USD |
+| INV2-YT49-B4LV-83VX-XD64 | DRAFT | SEED-20261014-01 | USD |
+
+#### Details
+
+Each invoice has the following details:
+
+- `id`: Unique identifier for the invoice.
+- `status`: The current status of the invoice (e.g., DRAFT, SENT, PAID).
+- `invoice_number`: A unique number assigned to the invoice.
+- `currency_code`: The currency associated with the invoice (in this case, USD).
+- `amount` and `due_amount`: The total amount due for the invoice and the amount due, respectively.
+- `primary_recipients`: A list of recipients who are primary contacts for the invoice.
+- `links`: A list of links that can be used to interact with the invoice (e.g., GET, POST, PUT, DELETE).
+
+![Invoice test result in the chat UI](docs/screenshots/invoice-test-result.png)
 
 ## Tool onboarding
 
@@ -144,7 +167,8 @@ database as a disposable test target.
 ## Documentation
 
 - [Solution report](docs/Refined-version/Agentic_System_Design_and_Implementation_Report.docx)
-- [Low-level design](docs/LLD.md)
+- [High-level design](HLD.md)
+- [Low-level design](LLD.md)
 - [Integration test guide](tests/integration/README.md)
 
 

@@ -10,7 +10,7 @@ from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 from pydantic import BaseModel, Field
 
 from app.agent.chat_models import create_chat_model
-from app.agent.llm import DATA_POLICY, load_prompt
+from app.agent.llm import DATA_POLICY, UNTRUSTED_DATA_POLICY, load_prompt
 from app.db.session import Database
 from app.security import TokenAuthenticator
 from app.settings import Settings
@@ -365,7 +365,10 @@ async def run_chat(
             "fields, order, and limits. "
             + grounding
             + " If tool_call_limit_reached is true, say the result may be incomplete. "
-            + DATA_POLICY
+            + UNTRUSTED_DATA_POLICY
+            + " Return the answer as readable Markdown, not a JSON contract or a copy of "
+            "the input evidence. Select only the records and fields needed to answer the "
+            "original question; when one record is requested, show one verified record."
         )
         final_input = json.dumps(evidence, ensure_ascii=False, default=str)
         await record(
@@ -394,14 +397,22 @@ async def run_chat(
                 }
             )
             raise
-        summary = message_text(final.content)
-        await record(
-            {
-                "event": "final_response",
-                "response": summary,
-                "usage": getattr(final, "usage_metadata", None),
-            }
-        )
+        summary = message_text(final.content).strip()
+        if not summary:
+            error = "The model returned an empty final answer. Tool results may already exist; inspect them before retrying."
+            await record(
+                {"event": "llm_failed", "purpose": "respond", "error_type": "EmptyFinalResponse", "error": error}
+            )
+            raise ValueError(error)
+        final_event = {
+            "event": "final_response",
+            "response": summary,
+            "usage": getattr(final, "usage_metadata", None),
+        }
+        # Show the answer before event/history persistence or resource cleanup can delay it.
+        if progress:
+            progress(final_event)
+        await record(final_event)
         return {"summary": summary, "goal_plan": goal, "results": results, "events": events}
     finally:
         if catalog is not None:

@@ -197,10 +197,7 @@ def main() -> None:
                     principal,
                     st.session_state.appv2_conversation_id,
                     prompt,
-                    progress=lambda event: output.markdown(
-                        f"**Goal:** {event['user_goal']}\n\n**Actions:** "
-                        + "; ".join(event.get("tool_actions", []))
-                    ) if event.get("event") == "goal_plan" else None,
+                    progress=lambda event: render_progress(output, event),
                 )
             )
             st.session_state.appv2_conversation_id = conversation_id
@@ -208,7 +205,7 @@ def main() -> None:
             if result.get("goal_plan"):
                 render_goal(result["goal_plan"])
             if result.get("results"):
-                with st.expander("Tool results", expanded=True):
+                with st.expander("Tool results", expanded=False):
                     st.json(result["results"])
         except Exception as error:  # noqa: BLE001 -- show owner-visible application error
             detail = str(SecretRedactor(settings)(f"{type(error).__name__}: {error}"))
@@ -219,6 +216,16 @@ def main() -> None:
                     get_client().flush()
                 except Exception as error:  # noqa: BLE001 -- telemetry must not mask chat result
                     LOGGER.warning("Langfuse flush failed (%s)", type(error).__name__)
+
+
+def render_progress(output, event: dict) -> None:
+    if event.get("event") == "final_response":
+        output.markdown(event["response"])
+    elif event.get("event") == "goal_plan":
+        output.markdown(
+            f"**Goal:** {event['user_goal']}\n\n**Actions:** "
+            + "; ".join(event.get("tool_actions", []))
+        )
 
 
 def render_goal(plan: dict) -> None:
