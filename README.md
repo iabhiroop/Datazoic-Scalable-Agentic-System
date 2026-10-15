@@ -30,7 +30,7 @@ The full API catalog stays in the registry rather than appearing in every prompt
 
 ## Architecture
 
-![System architecture](docs/report/diagrams/01_system_architecture.png)
+![System architecture](assets/readme/01_system_architecture.png)
 
 ## Getting started
 
@@ -92,7 +92,7 @@ Each invoice has the following details:
 - `primary_recipients`: A list of recipients who are primary contacts for the invoice.
 - `links`: A list of links that can be used to interact with the invoice (e.g., GET, POST, PUT, DELETE).
 
-![Invoice test result in the chat UI](docs/screenshots/invoice-test-result.png)
+![Invoice test result in the chat UI](assets/readme/invoice-test-result.png)
 
 ## Tool onboarding
 
@@ -176,16 +176,16 @@ database as a disposable test target.
 
 Intent classification, action planning, tool selection and execution in the agent workflow.
 
-![Agent structure](docs/report/diagrams/02_agent_structure.png)
+![Agent structure](assets/readme/02_agent_structure.png)
 
 ## Tool routing
 
 Tool onboarding, retrieval and validation before dispatch.
 
-![Tool routing](docs/report/diagrams/03_tool_routing.png)
+![Tool routing](assets/readme/03_tool_routing.png)
 
 ## State management
 
 Run state, checkpoints and recovery in the checkpointed workflow described in the report.
 
-![State management](docs/report/diagrams/04_state_management.png)
+![State management](assets/readme/04_state_management.png)
